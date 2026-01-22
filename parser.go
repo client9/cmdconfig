@@ -189,7 +189,6 @@ func (s *Scanner) parseQuote1() (string, error) {
 			out := string(s.s[i:s.pos])
 			s.advance()
 			return out, nil
-		// TODO: backslash
 		default:
 			s.advance()
 		}
@@ -372,7 +371,6 @@ func (s *Scanner) Next() ([]string, string, error) {
 				return args, body, nil
 			}
 		}
-		// TODO: case blackslash
 		// TODO: # comments
 	}
 
