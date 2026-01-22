@@ -695,6 +695,48 @@ func TestDedent(t *testing.T) {
 	}
 }
 
+func TestNestedScannerPositions(t *testing.T) {
+	// Test that NewFromScanner preserves position information correctly
+	input := "cmd1 arg1\ncmd2 { nested content }\ncmd3 arg3"
+	parentScanner := NewScanner([]byte(input))
+
+	// Parse first command
+	args1, _, err := parentScanner.Next()
+	if err != nil {
+		t.Fatalf("Failed to parse first command: %v", err)
+	}
+	if !reflect.DeepEqual(args1, []string{"cmd1", "arg1"}) {
+		t.Errorf("Expected [cmd1 arg1], got %v", args1)
+	}
+
+	// Parse second command with body
+	args2, body2, err := parentScanner.Next()
+	if err != nil {
+		t.Fatalf("Failed to parse second command: %v", err)
+	}
+	if !reflect.DeepEqual(args2, []string{"cmd2"}) {
+		t.Errorf("Expected [cmd2], got %v", args2)
+	}
+
+	// Create nested scanner with position inheritance
+	nestedScanner := NewFromScanner(parentScanner, []byte(body2))
+
+	// The nested scanner should start with line 2 (where the brace block was)
+	pos := nestedScanner.currentPos()
+	if pos.Line != 2 {
+		t.Errorf("Expected nested scanner to start at line 2, got line %d", pos.Line)
+	}
+
+	// Parse nested content
+	nestedArgs, _, err := nestedScanner.Next()
+	if err != nil {
+		t.Fatalf("Failed to parse nested content: %v", err)
+	}
+	if !reflect.DeepEqual(nestedArgs, []string{"nested", "content"}) {
+		t.Errorf("Expected [nested content], got %v", nestedArgs)
+	}
+}
+
 func TestErrorLocations(t *testing.T) {
 	type errorLocationTest struct {
 		input    string
