@@ -232,33 +232,33 @@ func TestParse(t *testing.T) {
 
 func TestParseErrors(t *testing.T) {
 	type errorTest struct {
-		input string
+		input         string
 		errorContains string
 	}
 
 	tests := []errorTest{
 		{
-			input: "'unclosed single quote",
+			input:         "'unclosed single quote",
 			errorContains: "got EOF in single quote",
 		},
 		{
-			input: "\"unclosed double quote",
+			input:         "\"unclosed double quote",
 			errorContains: "got EOF in double quote",
 		},
 		{
-			input: "`unclosed backtick",
+			input:         "`unclosed backtick",
 			errorContains: "got EOF in back quote",
 		},
 		{
-			input: "{unclosed brace",
+			input:         "{unclosed brace",
 			errorContains: "got EOF in opening brace",
 		},
 		{
-			input: "trailing\\",
+			input:         "trailing\\",
 			errorContains: "got EOF after backslash",
 		},
 		{
-			input: "{unclosed with escape\\",
+			input:         "{unclosed with escape\\",
 			errorContains: "got EOF after backslash",
 		},
 	}
@@ -739,53 +739,53 @@ func TestNestedScannerPositions(t *testing.T) {
 
 func TestErrorLocations(t *testing.T) {
 	type errorLocationTest struct {
-		input    string
-		expectedLine int
+		input          string
+		expectedLine   int
 		expectedColumn int
 		expectedOffset int
-		errorContains string
+		errorContains  string
 	}
 
 	tests := []errorLocationTest{
 		{
 			// Error on line 1, column 1
-			input: "'unclosed",
-			expectedLine: 1,
+			input:          "'unclosed",
+			expectedLine:   1,
 			expectedColumn: 10, // At EOF position after 'unclosed'
 			expectedOffset: 9,
-			errorContains: "got EOF in single quote at line 1, column 10",
+			errorContains:  "got EOF in single quote at line 1, column 10",
 		},
 		{
 			// Error on line 2 (single quote starts on line 2)
-			input: "\n'unclosed",
-			expectedLine: 2,
+			input:          "\n'unclosed",
+			expectedLine:   2,
 			expectedColumn: 10, // After 'unclosed' (9 chars + initial quote position)
 			expectedOffset: 10, // newline + 9 chars
-			errorContains: "got EOF in single quote at line 2, column 10",
+			errorContains:  "got EOF in single quote at line 2, column 10",
 		},
 		{
 			// Error spans multiple lines within single quote
-			input: "'start\nunclosed",
-			expectedLine: 2,
-			expectedColumn: 9, // After 'unclosed'
+			input:          "'start\nunclosed",
+			expectedLine:   2,
+			expectedColumn: 9,  // After 'unclosed'
 			expectedOffset: 15, // 'start\nunclosed = 15 chars total
-			errorContains: "got EOF in single quote at line 2, column 9",
+			errorContains:  "got EOF in single quote at line 2, column 9",
 		},
 		{
 			// Backslash at EOF
-			input: "trailing\\",
-			expectedLine: 1,
+			input:          "trailing\\",
+			expectedLine:   1,
 			expectedColumn: 10, // At EOF after backslash
 			expectedOffset: 9,
-			errorContains: "got EOF after backslash at line 1, column 10",
+			errorContains:  "got EOF after backslash at line 1, column 10",
 		},
 		{
 			// Multi-line with brace error
-			input: "{\nline2\nline3",
-			expectedLine: 3,
-			expectedColumn: 6, // At EOF position
+			input:          "{\nline2\nline3",
+			expectedLine:   3,
+			expectedColumn: 6,  // At EOF position
 			expectedOffset: 13, // { + \n + line2 + \n + line3 = 13 chars
-			errorContains: "got EOF in opening brace at line 3, column 6",
+			errorContains:  "got EOF in opening brace at line 3, column 6",
 		},
 	}
 
@@ -854,5 +854,3 @@ func TestPositionTracking(t *testing.T) {
 		t.Fatalf("expected [line3] but got %v", args3)
 	}
 }
-
-
